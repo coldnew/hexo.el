@@ -296,10 +296,10 @@ Disable current filter (ex: tag) is exist."
                         (+ status date categories 20))) ;20 spaces are remained for Tags
          (filename (min 40
                         (floor (* left-width 0.4))))
-         (title (min 48
+         (title (min 90
                      (- left-width filename))))
     (vector (list "Status" status t)
-            (list "Filename" filename t)
+            ;; (list "Filename" filename t)
             (list "Title" title t)
             (list "Date"  date t)
             (list "Categories"  categories t)
@@ -414,7 +414,7 @@ In `tabulated-list-mode', use `tabulated-list-get-id' and
            (if (equal (hexo-get-article-parent-dir-name file-path) "_posts")
                (propertize "post" 'face 'hexo-status-post)
              (propertize "draft" 'face 'hexo-status-draft))
-           (file-name-base file-path)
+           ;; (file-name-base file-path)
            (propertize (hexo-cdr-assq 'title info) 'face 'hexo-title)
            (propertize (hexo-cdr-assq 'date info) 'face 'hexo-date)
            (mapconcat (lambda (x) (propertize x 'face 'hexo-category))
