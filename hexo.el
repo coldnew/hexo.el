@@ -852,7 +852,10 @@ under theme/default/layout/"
            (goto-char (point-max))
            (insert "#+LAYOUT: \n#+CATEGORIES: \n")
            (goto-char 0)
-           (replace-regexp "title: .+$" (format "#+TITLE: %s" title)))
+           (replace-regexp "title: .+$" (format "#+TITLE: %s" title))
+           (goto-char (point-max))
+           (insert (format "#+PERMALINK: %s" (substring (sha1 title) 0 5)))
+           (newline-and-indent))
           (t
            (find-file created-md-file-path)
            (goto-char 0)
