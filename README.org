@@ -1,3 +1,13 @@
+This is my *fork* of [[https://github.com/kuanyui/hexo.el][kuanyui/hexo.el]], I add some my personal's feature like customize the UI.
+
+Other feature if suite for anyone, I'll PR back to [[https://github.com/kuanyui/hexo.el][kuanyui/hexo.el]].
+
+Here's the PR lists:
+
+  - [ ] [[https://github.com/kuanyui/hexo.el/pull/11][#11 post_asset_folder support]]
+
+  - [X] [[https://github.com/kuanyui/hexo.el/pull/12][#12 Increase head-lines value when get article info]]
+
 * hexo.el
 Emacs major-mode & tools for [[https://github.com/hexojs/hexo][Hexo]]. σ(´∀｀*)
 
