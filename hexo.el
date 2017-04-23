@@ -482,6 +482,7 @@ KEY is a downcased symbol. <ex> 'status "
 (define-key hexo-mode-map (kbd "g") 'hexo-command-revert-tabulated-list)
 (define-key hexo-mode-map (kbd "S") 'tabulated-list-sort)
 (define-key hexo-mode-map (kbd "f") 'hexo-command-filter-tag)
+(define-key hexo-mode-map (kbd "F") 'hexo-command-filter-categories)
 ;; Edit
 (define-key hexo-mode-map (kbd "T T") 'hexo-touch-files-in-dir-by-time)
 (define-key hexo-mode-map (kbd "T S") 'hexo-toggle-article-status)
@@ -503,11 +504,11 @@ KEY is a downcased symbol. <ex> 'status "
 (defun hexo-get-help-string ()
   (let* ((help-str (concat
                     (propertize
-                     "File             View              Edit                 Mark                Server             Mode\n" 'face 'header-line)
-                    "[RET] Open       [  g] Refresh     [T T] Touch time     [  m] Mark          [s r] Run server   [  ?] Show this help\n"
-                    "[SPC] Show Info  [  S] Sort        [T S] Toggle status  [  u] Unmark        [s s] Stop server  [  Q] Quit\n"
-                    "[  N] New        [  f] Filter tag  [  t] Tags toggler   [M a] Add tags      [s d] Deploy\n"
-                    "[  R] Rename                                            [M r] Remove tags\n"
+                     "File             View                    Edit                 Mark                Server             Mode\n" 'face 'header-line)
+                    "[RET] Open       [  g] Refresh           [T T] Touch time     [  m] Mark          [s r] Run server   [  ?] Show this help\n"
+                    "[SPC] Show Info  [  S] Sort              [T S] Toggle status  [  u] Unmark        [s s] Stop server  [  Q] Quit\n"
+                    "[  N] New        [  f] Filter tag        [  t] Tags toggler   [M a] Add tags      [s d] Deploy\n"
+                    "[  R] Rename     [  F] Filter categories                                          [M r] Remove tags\n"
                     "[  D] Delete"))
          (help-str-without-brackets (replace-regexp-in-string "[][]" " " help-str 'fixedcase)))
     (mapc (lambda (begin-end)
@@ -726,6 +727,13 @@ If you want to edit the tags of a single file, use hexo-command-tags-toggler (pr
   (format "%s"
           (mapconcat #'identity tags-list ", ")))
 
+(defun hexo-get-all-categories (&optional root-dir)
+  (hexo-sort-string-list
+   (hexo-remove-duplicates-in-string-list
+    (cl-mapcan (lambda (file-path)
+                 (cdr (assq 'categories (hexo-get-article-info file-path))))
+               (hexo-get-all-article-files root-dir 'include-drafts)))))
+
 (defun hexo-command-show-article-info ()
   "Show article's info in minibuffer, so the columns won't be
 truncated by `tabulated-list'."
@@ -772,6 +780,24 @@ truncated by `tabulated-list'."
                       (let* ((info (hexo-get-article-info (car x)))
                              (tags-list (cdr (assq 'tags info))))
                         (member tag tags-list))))
+              (tabulated-list-revert)
+              (hexo-message "Press %s to disable filter" "g"))))))
+
+(defun hexo-command-filter-categories ()
+  "Filter articles by categories"
+  (interactive)
+  (hexo-mode-only
+   (let ((categories (ido-completing-read "Filter categories: "
+                                          (hexo-get-all-categories (hexo-find-root-dir)) nil t)))
+     (if (string= "" categories)
+         (message "No categories inputed, abort.")
+       ;; Assign variable `hexo-tabulated-list-entries-filter' as our filter function
+       (progn (setq hexo-tabulated-list-entries-filter
+                    ;; Hallelujah lexical-binding!
+                    (lambda (x) ;car is id (file-path), cdr is ([status ...])
+                      (let* ((info (hexo-get-article-info (car x)))
+                             (categories-list (cdr (assq 'categories info))))
+                        (member categories categories-list))))
               (tabulated-list-revert)
               (hexo-message "Press %s to disable filter" "g"))))))
 
